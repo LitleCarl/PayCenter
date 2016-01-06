@@ -28,4 +28,11 @@ class Customer < ActiveRecord::Base
   # 关联微信渠道
   has_one :wx_channel
 
+  #
+  # 根据session_key查找客户
+  #
+  def self.query_first_by_user_session_key(options)
+    Customer.joins(:authentication_tokens).where('authentication_tokens.auth_token = ? and authentication_tokens.expired_at > ?', options[:user_session_key], Time.now).first
+  end
+
 end

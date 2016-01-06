@@ -14,6 +14,9 @@
 
 class Notification < ActiveRecord::Base
 
+  # 通用查询方法
+  include Concerns::Query::Methods
+
   # 关联支付
   belongs_to :charge
 

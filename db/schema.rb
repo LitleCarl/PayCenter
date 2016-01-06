@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160106031403) do
+ActiveRecord::Schema.define(version: 20160106062645) do
 
   create_table "alipay_channels", force: :cascade do |t|
     t.string   "pid",               limit: 255,                comment: "PID"
@@ -32,6 +32,18 @@ ActiveRecord::Schema.define(version: 20160106031403) do
     t.datetime "updated_at",              null: false
     t.string   "notify_url",  limit: 255,              comment: "客户服务器异步通知地址"
   end
+
+  create_table "authentication_tokens", force: :cascade, comment: "认证令牌" do |t|
+    t.string   "auth_token",    limit: 255,              comment: "令牌内容"
+    t.datetime "expired_at",                             comment: "过期时间"
+    t.integer  "resource_id",   limit: 4,                comment: "多态关联"
+    t.string   "resource_type", limit: 255,              comment: "多态关联"
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "authentication_tokens", ["auth_token"], name: "index_authentication_tokens_on_auth_token", using: :btree
+  add_index "authentication_tokens", ["resource_type", "resource_id"], name: "index_authentication_tokens_on_resource_type_and_resource_id", using: :btree
 
   create_table "charges", force: :cascade do |t|
     t.boolean  "live_mode",                    null: false, comment: "沙盒模式"
