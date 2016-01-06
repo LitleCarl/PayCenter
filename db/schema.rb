@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160105023920) do
+ActiveRecord::Schema.define(version: 20160106031403) do
 
   create_table "alipay_channels", force: :cascade do |t|
     t.string   "pid",               limit: 255,                comment: "PID"
@@ -30,6 +30,7 @@ ActiveRecord::Schema.define(version: 20160105023920) do
     t.integer  "customer_id", limit: 4,                comment: "关联客户"
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.string   "notify_url",  limit: 255,              comment: "客户服务器异步通知地址"
   end
 
   create_table "charges", force: :cascade do |t|
@@ -48,6 +49,7 @@ ActiveRecord::Schema.define(version: 20160105023920) do
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
     t.text     "credential",     limit: 65535,              comment: "支付渠道凭据"
+    t.datetime "deleted_at",                                comment: "删除时间"
   end
 
   create_table "customers", force: :cascade do |t|
@@ -60,6 +62,16 @@ ActiveRecord::Schema.define(version: 20160105023920) do
     t.string   "contact_phone",   limit: 255,              comment: "联系电话"
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string   "channel",               limit: 255,                comment: "支付渠道"
+    t.integer  "charge_id",             limit: 4,                  comment: "关联支付"
+    t.boolean  "received",                                         comment: "客服服务器已接收到通知"
+    t.integer  "send_time",             limit: 4,                  comment: "当前向客户服务器发送通知次数"
+    t.text     "original_notification", limit: 65535,              comment: "微信服务器发来的原始通知内容"
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "wx_channels", force: :cascade do |t|

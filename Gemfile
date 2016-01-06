@@ -30,7 +30,8 @@ gem 'annotate', '2.6.5'
 
 gem 'migration_comments', '0.3.2'
 
-# gem 'wx_pay', git: 'git@github.com:LitleCarl/wx_pay.git'
+# ActiveRecord plugin allowing you to hide and restore records without actually deleting them. Read more: https://github.com/ActsAsParanoid/acts_as_paranoid
+gem 'acts_as_paranoid', '0.5.0.beta2' # TODO
 
 # RequestStore gives you per-request global storage. http://github.com/steveklabnik/request_store
 gem 'request_store', '= 1.2.1'

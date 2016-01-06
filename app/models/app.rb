@@ -8,6 +8,7 @@
 #  customer_id :integer                                # 关联客户
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  notify_url  :string(255)                            # 客户服务器异步通知地址
 #
 
 class App < ActiveRecord::Base

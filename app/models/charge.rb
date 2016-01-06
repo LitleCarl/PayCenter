@@ -18,9 +18,12 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  credential     :text(65535)                            # 支付渠道凭据
+#  deleted_at     :datetime                               # 删除时间
 #
 
 class Charge < ActiveRecord::Base
+
+  acts_as_paranoid column: 'deleted_at', column_type: 'time'
 
   # 通用查询方法
   include Concerns::Query::Methods
@@ -77,6 +80,14 @@ class Charge < ActiveRecord::Base
 
         # 是否是正式模式
         live_mode = (customer.live_key == customer_key)
+
+        # 查找是否有过此订单号的charge,有则软删除
+        charge = app.charges.where(order_no: order_no).first
+
+        if charge.present?
+          # 软删除
+          charge.destroy
+        end
 
         charge = Charge.new
         charge.live_mode = live_mode

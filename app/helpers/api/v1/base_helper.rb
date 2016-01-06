@@ -1,4 +1,4 @@
-module Api::BaseHelper
+module Api::V1::BaseHelper
   #
   # 渲染json返回属性
   #
