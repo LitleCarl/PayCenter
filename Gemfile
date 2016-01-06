@@ -23,6 +23,21 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
+# A simple, fast Mysql library for Ruby, binding to libmysql. http://github.com/brianmario/mysql2
+gem 'mysql2', '~> 0.3.18'
+
+gem 'annotate', '2.6.5'
+
+gem 'migration_comments', '0.3.2'
+
+# gem 'wx_pay', git: 'git@github.com:LitleCarl/wx_pay.git'
+
+# RequestStore gives you per-request global storage. http://github.com/steveklabnik/request_store
+gem 'request_store', '= 1.2.1'
+
+# A simple HTTP and REST client for Ruby, inspired by the Sinatra microframework style of specifying actions: get, put, post, delete. https://github.com/rest-client/rest-client
+gem 'rest-client', '= 1.8'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 
