@@ -48,6 +48,8 @@ class AlipayChannel < ActiveRecord::Base
       subject, body, order_no, total_fee, client_ip = options[:subject], options[:body], options[:order_no], options[:total_fee], options[:client_ip]
       res.__raise__miss_request_params('参数错误') if id.blank? || subject.blank? || body.blank? || order_no.blank? || total_fee.blank? || client_ip.blank?
 
+      total_fee = total_fee.to_i * 0.01
+
       alipay = query_first_by_id(id)
 
       RequestStore.store[:alipay] = alipay
