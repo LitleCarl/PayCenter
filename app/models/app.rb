@@ -19,4 +19,6 @@ class App < ActiveRecord::Base
   # 关联客户
   belongs_to :customer
 
+  # 关联支付
+  has_many :charges
 end

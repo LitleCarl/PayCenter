@@ -13,6 +13,7 @@
 #  customer_id               :integer                                # 所属客户
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  app_id                    :integer                                # 关联应用
 #
 
 class WxChannel < ActiveRecord::Base
@@ -22,6 +23,9 @@ class WxChannel < ActiveRecord::Base
 
   # 关联客户
   belongs_to :customer
+
+  # 关联应用
+  belongs_to :app
 
   #
   # 请求微信服务器获取支付凭证
@@ -63,7 +67,7 @@ class WxChannel < ActiveRecord::Base
           trade_type: 'APP',
           nonce_str: nonce_str
       }
-      result = WxPay::Service.invoke_unifiedorder(params)
+      result = WxPay::Service.invoke_unifiedorder(params).deep_symbolize_keys
       # => {
       #      "return_code"=>"SUCCESS",
       #      "return_msg"=>"OK",
@@ -76,11 +80,16 @@ class WxChannel < ActiveRecord::Base
       #      "trade_type"=>"APP"
       #    }
 
+      puts "微信支付返回结果1#{result}"
+
+
       # 重新签名结果
       result = WxPay::Service::generate_app_pay_req({
                                                         noncestr: nonce_str,
                                                         prepayid: result[:prepay_id]
-                                                    })
+                                                    }).deep_symbolize_keys
+      puts "微信支付返回结果2#{result}"
+
       # => {
       #      appid: 'wxd930ea5d5a258f4f',
       #      partnerid: '1900000109',

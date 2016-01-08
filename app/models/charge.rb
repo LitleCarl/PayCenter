@@ -39,7 +39,7 @@ class Charge < ActiveRecord::Base
     ALIPAY = 'alipay'
 
     # 微信
-    WEIXIN = 'wx'
+    WX = 'wx'
 
     # 全部
     ALL = get_all_values
@@ -50,16 +50,41 @@ class Charge < ActiveRecord::Base
   #
   # @param options [Hash]
   # option options [Customer] :customer 客户
-  # option options [Customer] :app_id 应用id
+  # option options [Customer] :id 支付信息id
+  #
+  # @return [Response, Hash] 状态，支付凭证
+  #
+  def self.query_charge_with_options(options = {})
+    charge = nil
+
+    response = Response.__rescue__ do |res|
+      id, customer = options[:id], options[:customer]
+
+      res.__raise__miss_request_params('参数缺失') if customer.blank? || id.blank?
+
+      charge = customer.charges.where(id: id).first
+
+      res.__raise__data_miss_error('支付信息不存在') if charge.blank?
+    end
+
+    return response, charge
+
+  end
+  #
+  # 申请支付信息并返回Charge对象
+  #
+  # @param options [Hash]
+  # option options [Customer] :customer 客户
+  # option options [String] :customer_key 客户key
+  # option options [Customer] :app_code 应用code
   # option options [String] :subject 商品名称
   # option options [String] :body 商品描述
-  # option options [String] :customer_key 客户key
   # option options [String] :order_no 订单号
   # option options [String] :amount 总金额(单位为分)
   # option options [String] :client_ip 客户端ip
   # option options [String] :channel 支付渠道
   #
-  # @return [Response, Hash] 状态，微信支付凭证
+  # @return [Response, Hash] 状态，支付凭证
   #
   def self.create_with_options(options)
     charge = nil
@@ -67,14 +92,14 @@ class Charge < ActiveRecord::Base
     catch_proc = proc{ charge = nil }
 
     response = Response.__rescue__(catch_proc) do |res|
-      customer, subject, body, order_no, amount, client_ip, channel, customer_key, app_id = options[:customer], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:customer_key], options[:app_id]
+      customer, subject, body, order_no, amount, client_ip, channel, customer_key, app_code = options[:customer], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:customer_key], options[:app_code]
 
-      res.__raise__miss_request_params('参数缺失') if customer.blank? || subject.blank? || body.blank? || order_no.blank? || amount.blank? || client_ip.blank? || channel.blank? || customer_key.blank? || app_id.blank?
+      res.__raise__miss_request_params('参数缺失') if customer.blank? || subject.blank? || body.blank? || order_no.blank? || amount.blank? || client_ip.blank? || channel.blank? || customer_key.blank? || app_code.blank?
 
       res.__raise__data_process_error('非法的channel参数') unless Channel::ALL.include?(channel)
 
       transaction do
-        app = customer.apps.where(id: app_id).first
+        app = customer.apps.where(code: app_code).first
 
         res.__raise__data_miss_error('APP未发现') if app.blank?
 
@@ -97,12 +122,16 @@ class Charge < ActiveRecord::Base
         charge.amount = amount
         charge.body = body
         charge.subject = subject
+        charge.paid = false
+        charge.refunded = false
 
         charge.save!
 
         case channel
-        when Chanel::WEIXIN
-          wx_channel = customer.wx_channel
+        when Channel::WX
+          inner_response, wx_channel = customer.channel_by_options(app_code: app_code, channel: channel)
+
+          res.__raise__response__(inner_response)
 
           res.__raise__data_miss_error('此客户没有开通微信支付渠道') if wx_channel.blank?
 
@@ -113,29 +142,38 @@ class Charge < ActiveRecord::Base
               total_fee: amount,
               client_ip: client_ip
           }
+
           inner_response, weixin_info = WxChannel.request_prepay(pay_info)
 
           res.__raise__response__ inner_response
 
           charge.credential = {wx: weixin_info}.to_json
-        when Chanel::ALIPAY
-           alipay_channel = customer.alipay_channel
+
+
+          charge.save!
+        when Channel::ALIPAY
+          inner_response, alipay_channel = customer.channel_by_options(app_code: app_code, channel: channel)
+
+          res.__raise__response__(inner_response)
 
            res.__raise__data_miss_error('此客户没有开通支付宝支付渠道') if alipay_channel.blank?
 
            pay_info = {
-               id: wx_channel.id,
+               id: alipay_channel.id,
                body: body,
                order_no: order_no,
                total_fee: amount,
                client_ip: client_ip,
                subject: subject
            }
-           inner_response, alipay_info = AlipayChannel.request_prepay(pay_info)
+
+          inner_response, alipay_info = AlipayChannel.request_prepay(pay_info)
 
            res.__raise__response__ inner_response
 
            charge.credential = {alipay: alipay_info}.to_json
+
+           charge.save!
         end
       end
 

@@ -7,6 +7,11 @@ class ChargesController < ApplicationController
     @response, @charge = Charge.create_with_options(params)
   end
 
+  # 查询支付请求
+  def show
+    @response, @charge = Charge.query_charge_with_options(params)
+  end
+
   # 微信服务器异步通知
   def wx_notify
     result = Hash.from_xml(request.body.read)['xml'].deep_symbolize_keys

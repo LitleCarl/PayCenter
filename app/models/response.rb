@@ -125,7 +125,9 @@ class Response
       if response.code == Code::SUCCESS
         response.code = Code::ERROR
         response.message = e.message
-
+        Rails.logger.debug do
+          #puts e.backtrace
+        end
         # yloge(e, e.message)
       else
         Rails.logger.info response.message

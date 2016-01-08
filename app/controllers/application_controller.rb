@@ -1,7 +1,7 @@
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
-  protect_from_forgery with: :exception
+  #protect_from_forgery with: :exception
 
   # 验证用户
   before_filter :authentication_token_before_filter
@@ -25,7 +25,7 @@ class ApplicationController < ActionController::Base
     response = Response.__rescue__ do |response|
       # TODO: 给开发留的后门 后续删除
       if params[:backdoor_customer_di].present?
-        customer = Customer.where(id: params[:backdoor_user_di]).first
+        customer = Customer.query_first_by_id(params[:backdoor_user_di])
 
         response.__raise__(Response::Code::DATA_MISS_ERROR, '客户不存在') if customer.blank?
       else

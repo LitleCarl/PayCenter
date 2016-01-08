@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160106062645) do
+ActiveRecord::Schema.define(version: 20160108032327) do
 
   create_table "alipay_channels", force: :cascade do |t|
     t.string   "pid",               limit: 255,                comment: "PID"
@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 20160106062645) do
     t.integer  "customer_id",       limit: 4,                  comment: "所属客户"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.integer  "app_id",            limit: 4,                  comment: "关联应用"
   end
 
   create_table "apps", force: :cascade do |t|
@@ -97,6 +98,7 @@ ActiveRecord::Schema.define(version: 20160106062645) do
     t.integer  "customer_id",               limit: 4,                  comment: "所属客户"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.integer  "app_id",                    limit: 4,                  comment: "关联应用"
   end
 
 end

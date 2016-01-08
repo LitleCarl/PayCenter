@@ -26,7 +26,42 @@ class Customer < ActiveRecord::Base
   has_many :charges, through: :apps
 
   # 关联微信渠道
-  has_one :wx_channel
+  has_many :wx_channels
+
+  # 关联支付宝渠道
+  has_many :alipay_channels
+
+  #
+  # 根据options获取当前客户下的指定渠道
+  #
+  # @param options [Hash]
+  # option options [String] :app_code 应用code
+  # option options [String] :channel 支付渠道
+  #
+  # @return [Response, WxChannel/AlipayChannel] 响应,渠道对象
+  #
+  def channel_by_options(options = {})
+    channel = nil
+    response = Response.__rescue__ do |res|
+      app_code, channel = options[:app_code], options[:channel]
+
+      res.__raise__miss_request_params('参数缺失') if app_code.blank? || channel.blank?
+
+      if channel == Charge::Channel::ALIPAY
+        channel = self.alipay_channels.joins(:app).where(apps: {code: app_code}).first
+
+        res.__raise__data_miss_error('此app没有开通支付宝渠道') if channel.blank?
+      elsif channel == Charge::Channel::WX
+        channel = self.wx_channels.joins(:app).where(apps: {code: app_code}).first
+
+        res.__raise__data_miss_error('此app没有开通微信渠道') if channel.blank?
+      else
+        res.__raise__data_miss_error('Channel参数错误') if channel.blank?
+      end
+    end
+
+    return response, channel
+  end
 
   #
   # 根据session_key查找客户

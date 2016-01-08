@@ -11,6 +11,7 @@
 #  customer_id       :integer                                # 所属客户
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  app_id            :integer                                # 关联应用
 #
 
 class AlipayChannel < ActiveRecord::Base
@@ -20,6 +21,9 @@ class AlipayChannel < ActiveRecord::Base
 
   # 关联客户
   belongs_to :customer
+
+  # 关联应用
+  belongs_to :app
 
   #
   # 请求支付宝服务器获取支付凭证
