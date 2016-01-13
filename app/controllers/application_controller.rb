@@ -29,22 +29,28 @@ class ApplicationController < ActionController::Base
 
         response.__raise__(Response::Code::DATA_MISS_ERROR, '客户不存在') if customer.blank?
       else
-        user_session_key, timestamps, platform, salt = params[:user_session_key], params[:timestamps], params[:platform], params[:salt]
+        customer_key = params[:customer_key]
 
-        response.__raise__(Response::Code::INVALID_USER_SESSION_KEY, '缺少参数') if user_session_key.blank? || timestamps.blank? || platform.blank? || salt.blank?
+        response.__raise__(Response::Code::INVALID_USER_SESSION_KEY, '缺少参数') if customer_key.blank?
 
-        sign = Digest::MD5.hexdigest("+#{platform}#{timestamps}#{user_session_key.chars.sort.reverse.join('')}+")
+        live_mode = !customer_key.start_with?('sk_test_')
+        if live_mode
+          query = {live_key: customer_key}
+        else
+          query = {test_key: customer_key}
+        end
 
-        response.__raise__(Response::Code::INVALID_USER_SESSION_KEY, '签名不合法') if salt != sign
-        response.__raise__(Response::Code::INVALID_USER_SESSION_KEY, '用户会话key过期') if Time.now - Time.at(timestamps.to_i) >= 5 * 60
+        customer = Customer.query_first_by_options(query)
 
-        customer = Customer.query_first_by_user_session_key(user_session_key)
+        response.__raise__(Response::Code::DATA_MISS_ERROR, '客户不存在') if customer.blank?
 
-        response.__raise__(Response::Code::ERROR, '用户已注销') if customer.blank?
+        params[:customer] = customer
+        params[:customer_id] = customer.id
+        # 标明使用环境
+        params[:live_mode] = live_mode
       end
 
-      params[:customer] = customer
-      params[:customer_id] = customer.id
+
     end
 
     render json: response, status: 200 if response.code != Response::Code::SUCCESS

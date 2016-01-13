@@ -75,7 +75,7 @@ class Charge < ActiveRecord::Base
   #
   # @param options [Hash]
   # option options [Customer] :customer 客户
-  # option options [String] :customer_key 客户key
+  # option options [String] :live_mode 使用环境(true表示正式,false表示测试)
   # option options [Customer] :app_code 应用code
   # option options [String] :subject 商品名称
   # option options [String] :body 商品描述
@@ -92,9 +92,9 @@ class Charge < ActiveRecord::Base
     catch_proc = proc{ charge = nil }
 
     response = Response.__rescue__(catch_proc) do |res|
-      customer, subject, body, order_no, amount, client_ip, channel, customer_key, app_code = options[:customer], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:customer_key], options[:app_code]
+      customer, subject, body, order_no, amount, client_ip, channel, live_mode, app_code = options[:customer], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:live_mode], options[:app_code]
 
-      res.__raise__miss_request_params('参数缺失') if customer.blank? || subject.blank? || body.blank? || order_no.blank? || amount.blank? || client_ip.blank? || channel.blank? || customer_key.blank? || app_code.blank?
+      res.__raise__miss_request_params('参数缺失') if customer.blank? || subject.blank? || body.blank? || order_no.blank? || amount.blank? || client_ip.blank? || channel.blank? || live_mode.blank? || app_code.blank?
 
       res.__raise__data_process_error('非法的channel参数') unless Channel::ALL.include?(channel)
 
@@ -104,7 +104,6 @@ class Charge < ActiveRecord::Base
         res.__raise__data_miss_error('APP未发现') if app.blank?
 
         # 是否是正式模式
-        live_mode = (customer.live_key == customer_key)
 
         # 查找是否有过此订单号的charge,有则软删除
         charge = app.charges.where(order_no: order_no).first
