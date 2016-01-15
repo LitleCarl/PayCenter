@@ -4,4 +4,4 @@ require File.expand_path('../application', __FILE__)
 # Initialize the Rails application.
 Rails.application.initialize!
 
-ENV['SSL_CERT_FILE'] = '/Users/tsaojixin/cacert.pem'
+ ENV['SSL_CERT_FILE'] = '/Users/tsaojixin/cacert.pem'

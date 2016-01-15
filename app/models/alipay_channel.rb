@@ -61,7 +61,7 @@ class AlipayChannel < ActiveRecord::Base
           body: body,
           out_trade_no: order_no,
           total_fee: total_fee,
-          notify_url: 'http://making.dev/notify',#TODO 回调地址需更新
+          notify_url: 'http://pay.doteetv.com.cn/charges/alipay_notify.json',#TODO 回调地址需更新
           subject: subject
       }
 

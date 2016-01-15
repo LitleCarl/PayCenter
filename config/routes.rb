@@ -56,5 +56,6 @@ Rails.application.routes.draw do
 
   resources :charges do
     post :wx_notify
+    post :alipay_notify
   end
 end

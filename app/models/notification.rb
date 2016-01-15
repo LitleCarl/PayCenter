@@ -20,6 +20,48 @@ class Notification < ActiveRecord::Base
   # 关联支付
   belongs_to :charge
 
+  def self.create_or_update_by_alipay(options = {})
+    response = Response.__rescue__ do |res|
+      out_trade_no = options[:out_trade_no]
+      time_paid = options[:gmt_payment]
+      transaction_no = options[:trade_no]
+      trade_status = options[:trade_status]
+      pid = options[:seller_id]
+
+      if trade_status != 'TRADE_SUCCESS'
+        res.__raise__data_process_error('暂时不处理')
+      end
+
+      alipay_channel = AlipayChannel.query_first_by_options(pid: pid)
+
+      res.__raise__miss_request_params('支付宝渠道错误') if alipay_channel.blank? || alipay_channel.app.blank?
+
+      app = alipay_channel.app
+
+      charge = app.charges.where(order_no: out_trade_no, channel: Charge::Channel::ALIPAY).first
+
+      res.__raise__miss_request_params('支付信息不存在') if charge.blank?
+
+      transaction do
+        if charge.present?
+          charge.paid = true
+          charge.time_paid = time_paid
+          charge.transaction_no = transaction_no
+          charge.save!
+
+          notification = self.new
+
+          notification.charge = charge
+          notification.send_time = 0
+          notification.original_notification = options.to_json
+          notification.save!
+        end
+      end
+    end
+
+    response
+  end
+
   #
   # 处理微信异步通知
   #
@@ -36,7 +78,7 @@ class Notification < ActiveRecord::Base
 
       res.__raise__miss_request_params('参数缺失') if app.blank?
 
-      charge = app.charges.where(order_no: out_trade_no).first
+      charge = app.charges.where(order_no: out_trade_no, channel: Charge::Channel::WX).first
 
       transaction do
         if charge.present?
