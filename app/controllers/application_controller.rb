@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   #protect_from_forgery with: :exception
 
   # 验证用户
-  before_filter :authentication_token_before_filter
+  #before_filter :authentication_token_before_filter
 
   private
 
@@ -44,7 +44,7 @@ class ApplicationController < ActionController::Base
 
         response.__raise__(Response::Code::DATA_MISS_ERROR, '客户不存在') if customer.blank?
 
-        params[:customer] = customer
+        params[:customers] = customer
         params[:customer_id] = customer.id
         # 标明使用环境
         params[:live_mode] = live_mode

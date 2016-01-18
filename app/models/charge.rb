@@ -49,7 +49,7 @@ class Charge < ActiveRecord::Base
   # 申请支付信息并返回Charge对象
   #
   # @param options [Hash]
-  # option options [Customer] :customer 客户
+  # option options [Customer] :customers 客户
   # option options [Customer] :id 支付信息id
   #
   # @return [Response, Hash] 状态，支付凭证
@@ -58,7 +58,7 @@ class Charge < ActiveRecord::Base
     charge = nil
 
     response = Response.__rescue__ do |res|
-      id, customer = options[:id], options[:customer]
+      id, customer = options[:id], options[:customers]
 
       res.__raise__miss_request_params('参数缺失') if customer.blank? || id.blank?
 
@@ -74,7 +74,7 @@ class Charge < ActiveRecord::Base
   # 申请支付信息并返回Charge对象
   #
   # @param options [Hash]
-  # option options [Customer] :customer 客户
+  # option options [Customer] :customers 客户
   # option options [String] :live_mode 使用环境(true表示正式,false表示测试)
   # option options [Customer] :app_code 应用code
   # option options [String] :subject 商品名称
@@ -92,7 +92,7 @@ class Charge < ActiveRecord::Base
     catch_proc = proc{ charge = nil }
 
     response = Response.__rescue__(catch_proc) do |res|
-      customer, subject, body, order_no, amount, client_ip, channel, live_mode, app_code = options[:customer], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:live_mode], options[:app_code]
+      customer, subject, body, order_no, amount, client_ip, channel, live_mode, app_code = options[:customers], options[:subject], options[:body], options[:order_no], options[:amount], options[:client_ip], options[:channel], options[:live_mode], options[:app_code]
 
       res.__raise__miss_request_params('参数缺失') if customer.blank? || subject.blank? || body.blank? || order_no.blank? || amount.blank? || client_ip.blank? || channel.blank? || live_mode.blank? || app_code.blank?
 

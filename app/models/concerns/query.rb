@@ -144,12 +144,12 @@ module Concerns::Query
       #   目前实现 多个查询参数
       #
       # @example
-      #   Tag.query_by_name_and_category('admin', 'test')
-      #   => SELECT `tags`.* FROM `tags` WHERE (`tags`.`deleted_at` IS NULL) AND `tags`.`name` = 'admin'
+      #   Tag.query_by_name_and_category('customers', 'test')
+      #   => SELECT `tags`.* FROM `tags` WHERE (`tags`.`deleted_at` IS NULL) AND `tags`.`name` = 'customers'
       #       AND `tags`.`category` = 'test'
       #
-      #   Tag.query_first_by_name_and_category('admin', 'test')
-      #   => SELECT  `tags`.* FROM `tags` WHERE (`tags`.`deleted_at` IS NULL) AND `tags`.`name` = 'admin' AND
+      #   Tag.query_first_by_name_and_category('customers', 'test')
+      #   => SELECT  `tags`.* FROM `tags` WHERE (`tags`.`deleted_at` IS NULL) AND `tags`.`name` = 'customers' AND
       #       `tags`.`category` = 'test'  ORDER BY `tags`.`id` ASC LIMIT 1
       #
       # def method_missing(name, *args)

@@ -48,6 +48,43 @@ gem 'rest-client', '= 1.8'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+# Flexible authentication solution for Rails with Warden. Read more: https://github.com/plataformatec/devise
+gem 'devise', '3.5.2'
+
+# source 'https://rails-assets.org' do
+#   # A collection of HTML element and attribute style-normalizations. Read more: https://github.com/necolas/normalize.css
+#   gem 'rails-assets-normalize.css', '3.0.3'
+#
+#   # The most popular HTML, CSS, and JavaScript framework for developing responsive, mobile first projects on the web. Read more: https://github.com/twbs/bootstrap
+#   gem 'rails-assets-bootstrap', '3.3.5'
+#
+#   # Parse, validate, manipulate, and display dates in javascript. Read more: https://github.com/moment/moment
+#   gem 'rails-assets-moment', '2.7.0' # lock version at 2.7.0
+#
+#   # Date/time picker widget based on twitter bootstrap. Read more: https://github.com/Eonasdan/bootstrap-datetimepicker
+#   gem 'rails-assets-eonasdan-bootstrap-datetimepicker', '3.0.0' # lock version at 3.0.0
+#
+#   # Make use of Bootstrap Modal more monkey-friendly. Read more: http://nakupanda.github.io/bootstrap3-dialog/
+#   gem 'rails-assets-bootstrap-dialog', '1.34.7'
+#
+#   # jQuery-based polyfill for the HTML5 placeholder attribute, that also patches $.fn.val properly. Read more: https://github.com/matoilic/jquery.placeholder
+#   gem 'rails-assets-jquery-placeholder', '2.3.0'
+#
+#   # Shim repository for jQuery UI. Read more: https://github.com/components/jqueryui http://jqueryui.com
+#   gem 'rails-assets-jquery-ui', '1.11.4'
+#
+#   # Sortable depend it
+#   # Knockout makes it easier to create rich, responsive UIs with JavaScript. Read more: https://github.com/knockout/knockout http://knockoutjs.com
+#   gem 'rails-assets-knockout', '3.4.0'
+#
+#   # Sortable — is a minimalist JavaScript library for reorderable drag-and-drop lists on modern browsers and touch devices.
+#   # No jQuery. Supports Meteor, AngularJS, React, Polymer and any CSS library, e.g. Bootstrap. Read more: https://github.com/RubaXa/Sortable http://rubaxa.github.io/Sortable/
+#   gem 'rails-assets-Sortable', '1.4.2'
+#
+#   # jQuery Lazy Load for Rails image_tag helpers. Read more: https://github.com/jassa/lazyload-rails
+#   gem 'rails-assets-jquery.lazyload', '1.9.3'
+# end
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug'

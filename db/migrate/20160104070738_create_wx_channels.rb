@@ -8,7 +8,7 @@ class CreateWxChannels < ActiveRecord::Migration
       t.string :refund_operator, comment: '商户添加的退款操作员 ID'
       t.text :client_certificate, comment: '微信客户端证书'
       t.text :client_certificate_secret, comment: '微信客户端证书密钥'
-      t.references :customer, comment: '所属客户'
+      t.references :customers, comment: '所属客户'
       t.timestamps null: false
     end
   end
