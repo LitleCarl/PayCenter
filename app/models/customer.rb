@@ -2,16 +2,25 @@
 #
 # Table name: customers
 #
-#  id              :integer          not null, primary key
-#  email           :string(255)      not null              # 邮箱
-#  test_key        :string(255)      not null              # 沙盒模式key
-#  live_key        :string(255)      not null              # 正式环境key
-#  company_name    :string(255)                            # 公司名
-#  company_address :string(255)                            # 公司地址
-#  contact_name    :string(255)                            # 联系人
-#  contact_phone   :string(255)                            # 联系电话
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id                     :integer          not null, primary key
+#  email                  :string(255)      not null               # 邮箱
+#  test_key               :string(255)      not null               # 沙盒模式key
+#  live_key               :string(255)      not null               # 正式环境key
+#  company_name           :string(255)                             # 公司名
+#  company_address        :string(255)                             # 公司地址
+#  contact_name           :string(255)                             # 联系人
+#  contact_phone          :string(255)                             # 联系电话
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  encrypted_password     :string(255)      default(""), not null
+#  reset_password_token   :string(255)
+#  reset_password_sent_at :datetime
+#  remember_created_at    :datetime
+#  sign_in_count          :integer          default("0"), not null
+#  current_sign_in_at     :datetime
+#  last_sign_in_at        :datetime
+#  current_sign_in_ip     :string(255)
+#  last_sign_in_ip        :string(255)
 #
 
 class Customer < ActiveRecord::Base

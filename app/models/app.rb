@@ -21,4 +21,10 @@ class App < ActiveRecord::Base
 
   # 关联支付
   has_many :charges
+
+  # 关联微信渠道
+  has_one :wx_channel
+
+  # 关联支付宝渠道
+  has_one :alipay_channel
 end

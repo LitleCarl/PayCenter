@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160118055522) do
+ActiveRecord::Schema.define(version: 20160118083626) do
 
   create_table "alipay_channels", force: :cascade do |t|
     t.string   "pid",               limit: 255,                comment: "PID"
@@ -63,6 +63,7 @@ ActiveRecord::Schema.define(version: 20160118055522) do
     t.datetime "updated_at",                   null: false
     t.text     "credential",     limit: 65535,              comment: "支付渠道凭据"
     t.datetime "deleted_at",                                comment: "删除时间"
+    t.string   "batch_no",       limit: 255,                comment: "支付宝用: 退款号"
   end
 
   create_table "customers", force: :cascade do |t|

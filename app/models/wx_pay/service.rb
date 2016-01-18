@@ -38,7 +38,7 @@ module WxPay
       params
     end
 
-    INVOKE_REFUND_REQUIRED_FIELDS = %i(out_refund_no total_fee refund_fee op_user_id)
+    INVOKE_REFUND_REQUIRED_FIELDS = %i(transaction_id out_refund_no total_fee refund_fee op_user_id)
     def self.invoke_refund(params, options = {})
       params = {
         appid: options.delete(:appid) || RequestStore[:wx].wx_app_id,
@@ -48,11 +48,13 @@ module WxPay
 
       params[:op_user_id] ||= params[:mch_id]
 
+      params[:sign] = WxPay::Sign.generate(params)
+
       check_required_options(params, INVOKE_REFUND_REQUIRED_FIELDS)
 
       options = {
-        ssl_client_cert: options.delete(:apiclient_cert) || WxPay.apiclient_cert,
-        ssl_client_key: options.delete(:apiclient_key) || WxPay.apiclient_key,
+        ssl_client_cert: options.delete(:apiclient_cert) || RequestStore[:wx].client_certificate,
+        ssl_client_key: options.delete(:apiclient_key) || RequestStore[:wx].client_certificate_secret,
         verify_ssl: OpenSSL::SSL::VERIFY_NONE
       }.merge(options)
 

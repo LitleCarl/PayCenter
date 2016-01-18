@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
   #protect_from_forgery with: :exception
 
   # 验证用户
-  #before_filter :authentication_token_before_filter
+  before_filter :authentication_token_before_filter
 
   private
 

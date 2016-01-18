@@ -19,6 +19,7 @@
 #  updated_at     :datetime         not null
 #  credential     :text(65535)                            # 支付渠道凭据
 #  deleted_at     :datetime                               # 删除时间
+#  batch_no       :string(255)                            # 支付宝用: 退款号
 #
 
 class Charge < ActiveRecord::Base
@@ -70,6 +71,7 @@ class Charge < ActiveRecord::Base
     return response, charge
 
   end
+
   #
   # 申请支付信息并返回Charge对象
   #
@@ -180,4 +182,94 @@ class Charge < ActiveRecord::Base
 
     return response, charge
   end
+
+  #
+  # 申请退款
+  #
+  # @param options [Hash]
+  # option options [Customer] :customer 客户
+  # option options [String] :id Charge id
+  # option options [String] :out_refund_no 商户退款号
+  #
+  # @return [Response, Hash] 状态，支付凭证
+  #
+  def self.refund_request(options = {})
+    charge = nil
+
+    catch_proc = proc{ charge = nil }
+
+    response = Response.__rescue__(catch_proc) do |res|
+      id, customer, out_refund_no = options[:id], options[:customer], options[:out_refund_no]
+
+      res.__raise__miss_request_params('参数缺失') if id.blank? || customer.blank? || out_refund_no.blank?
+
+      charge = Charge.query_first_by_id(id)
+
+      res.__raise__data_miss_error('此charge不存在') if charge.blank?
+      res.__raise__data_miss_error('此订单尚未付款') unless charge.paid
+      res.__raise__data_miss_error('此订单已经退款') if charge.refunded
+
+      case charge.channel
+        # 微信退款
+        when Channel::WX
+          wx_channel = charge.app.try(:wx_channel)
+
+          op_user_id = wx_channel.try(:refund_operator)
+          client_certificate_secret = wx_channel.client_certificate_secret
+          client_certificate = wx_channel.client_certificate
+
+          res.__raise__miss_request_params('微信渠道未添加退款操作员,请完善信息') if op_user_id.blank?
+          res.__raise__miss_request_params('微信渠道证书及私钥未提供,无法完成操作') if client_certificate.blank? || client_certificate_secret.blank?
+
+          result = WxPay::Service.invoke_refund(transaction_id: charge.transaction_no, out_refund_no: out_refund_no,total_fee: charge.amount, refund_fee: charge.amount, op_user_id: op_user_id).deep_symbolize_keys
+
+          if result[:result_code] == 'SUCCESS'
+            charge.refunded = true
+            charge.save!
+          end
+        # 支付宝退款
+        when Channel::ALIPAY
+          alipay_channel = charge.app.try(:alipay_channel)
+          batch_no = Alipay::Utils.generate_batch_no
+
+          result = Alipay::Service.refund_fastpay_by_platform_pwd_url(
+              batch_no: batch_no,
+              data: [{
+                         trade_no: charge.transaction_no,
+                         amount: charge.amount,
+                         reason: '退款'
+                     }],
+              notify_url: 'http://pay.doteetv.com.cn/charges/alipay_notify.json'
+          )
+
+      end
+
+    end
+  end
+
+  #
+  # 支付宝退款请求异步通知
+  #
+  # @param options [Hash]
+  # option options [String] :batch_no batch_no
+  #
+  # @return [Response, Charge] 状态，支付
+  #
+  def self.alipay_refund_async_notification(options = {})
+    response = Response.__rescue__(catch_proc) do |res|
+      batch_no = options[:batch_no]
+
+      res.__raise__miss_request_params('参数缺失') if batch_no.blank?
+
+      charge = Charge.query_first_by_options(batch_no: batch_no)
+
+      res.__raise__data_miss_error('订单不存在') unless charge.paid
+
+      chagre.refunded = true
+      charge.save!
+    end
+
+    return response, charge
+  end
+
 end

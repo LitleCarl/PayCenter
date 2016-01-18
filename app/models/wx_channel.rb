@@ -63,7 +63,7 @@ class WxChannel < ActiveRecord::Base
           out_trade_no: order_no,
           total_fee: total_fee,
           spbill_create_ip: client_ip,
-          notify_url: 'http://making.dev/notify',#TODO 回调地址需更新
+          notify_url: 'http://pay.doteetv.com.cn/charges/wx_notify.json',#TODO 回调地址需更新
           trade_type: 'APP',
           nonce_str: nonce_str
       }
